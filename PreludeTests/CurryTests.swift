@@ -15,8 +15,7 @@ final class CurryTests: XCTestCase {
 	}
 
 	func testTernaryCurrying() {
-		let f: ([Int]) -> (Int) -> ((Int, Int) -> Int) -> Int = curry(reduce)
-		XCTAssertEqual(f([1, 2, 3])(0)(+), 6)
+		XCTAssertEqual(curry(reduce)([1, 2, 3])(0)(+), 6)
 	}
 
 
@@ -34,7 +33,10 @@ final class CurryTests: XCTestCase {
 	func testTernaryUncurrying() {
 		typealias ArgumentsTuple = ([Int], Int, (Int, Int) -> Int)
 		let arguments: ArgumentsTuple = ([1, 2, 3], 0, +)
-		let f: (ArgumentsTuple) -> Int = uncurry(curry(reduce))
-		XCTAssertEqual((reduce as (ArgumentsTuple) -> Int)(arguments), f(arguments))
+		
+		let originalResult = reduce(sequence: arguments.0, initial: arguments.1, combine: arguments.2)
+		let sut = uncurry(curry(reduce))([1, 2, 3], 0, +)
+
+		XCTAssertEqual(originalResult, sut)
 	}
 }
